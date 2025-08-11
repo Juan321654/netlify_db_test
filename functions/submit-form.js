@@ -2,6 +2,23 @@
 const { Pool } = require("pg");
 
 exports.handler = async (event) => {
+  // Check the Origin header for security
+  let allowedOrigin = "https://static-with-serverless-db.netlify.app";
+  let origin =
+    event.headers && (event.headers.origin || event.headers.Origin || "");
+
+  const obscurer = "super-secret";
+
+  origin += obscurer;
+  allowedOrigin += obscurer;
+
+  if (origin !== allowedOrigin) {
+    return {
+      statusCode: 403,
+      body: JSON.stringify({ error: "Forbidden: Invalid origin" }),
+    };
+  }
+
   // Ensure the request is a POST
   if (event.httpMethod !== "POST") {
     return {
@@ -19,8 +36,8 @@ exports.handler = async (event) => {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Name and email are required" }),
-    };
-  }
+      };
+    }
 
     // Initialize the database connection using NETLIFY_DATABASE_URL
     const pool = new Pool({

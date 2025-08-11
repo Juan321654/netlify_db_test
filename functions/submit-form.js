@@ -63,7 +63,7 @@ exports.handler = async (event) => {
       email,
     ]);
 
-    // Optionally, delete used token
+    // Delete the token after successful submission
     await pool.query("DELETE FROM tokens WHERE token = $1", [sentToken]);
 
     return {
